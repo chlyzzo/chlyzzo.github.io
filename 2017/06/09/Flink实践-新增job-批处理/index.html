@@ -1,0 +1,592 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Flink实践-新增job-批处理 | 山上掏金</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    <meta name="baidu-site-verification" content="Poq2hMEF9U" />
+    
+    <meta name="author" content="chloy">
+    
+
+    
+    <meta name="description" content="本文讲述在Flink下怎么实现批处理操作，以计算文档的TF-IDF向量为例子。 批处理Flink下批处理用的数据类型是DataSet，按照一条一条记录存储，可以在多个分区上。Flink操作算子分为不打乱数据的分区和打乱数据分区两种；像map，flatmap这样单条执行的不打乱原有数据分区；而像groupBy，join等，会出现数据的新分区。 Rich 函数Flink下可拓展的函数，并且可以与环境相">
+<meta name="keywords" content="tf-idf,广播,richfunction">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flink实践-新增job-批处理">
+<meta property="og:url" content="https://chlyzzo.github.io/2017/06/09/Flink实践-新增job-批处理/index.html">
+<meta property="og:site_name" content="山上掏金">
+<meta property="og:description" content="本文讲述在Flink下怎么实现批处理操作，以计算文档的TF-IDF向量为例子。 批处理Flink下批处理用的数据类型是DataSet，按照一条一条记录存储，可以在多个分区上。Flink操作算子分为不打乱数据的分区和打乱数据分区两种；像map，flatmap这样单条执行的不打乱原有数据分区；而像groupBy，join等，会出现数据的新分区。 Rich 函数Flink下可拓展的函数，并且可以与环境相">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2017-12-10T04:46:04.894Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flink实践-新增job-批处理">
+<meta name="twitter:description" content="本文讲述在Flink下怎么实现批处理操作，以计算文档的TF-IDF向量为例子。 批处理Flink下批处理用的数据类型是DataSet，按照一条一条记录存储，可以在多个分区上。Flink操作算子分为不打乱数据的分区和打乱数据分区两种；像map，flatmap这样单条执行的不打乱原有数据分区；而像groupBy，join等，会出现数据的新分区。 Rich 函数Flink下可拓展的函数，并且可以与环境相">
+
+    
+    <link rel="alternative" href="/atom.xml" title="山上掏金" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <span id="busuanzi_container_site_pv">
+    站浏览量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+  <span id="busuanzi_container_site_uv">
+    站访问人数<span id="busuanzi_value_site_uv"></span>
+  </span>
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="山上掏金">山上掏金</a></h1>
+				<h2 class="blog-motto">每天早上起床就是为了比昨天更快乐，掏金者的一天是新的开始.</h2>
+			</div>                    
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">作者</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:chlyzzo.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post moveMain" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody">
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/06/09/Flink实践-新增job-批处理/" title="Flink实践-新增job-批处理" itemprop="url">Flink实践-新增job-批处理</a>
+  </h1>
+  <div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/flink/">flink</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/tf-idf/">tf-idf</a><a href="/tags/广播/">广播</a><a href="/tags/richfunction/">richfunction</a>
+  </div>
+
+</div>
+
+
+  <p class="article-author">By
+       
+		<a href="/about" title="chloy" target="_blank" itemprop="author">chloy</a>
+		
+  <p class="article-time">
+    <time datetime="2017-06-09T07:28:31.000Z" itemprop="datePublished"> 2017-06-09 阅读量 <span id="busuanzi_value_page_pv"></span></time>
+  </p>
+</header>
+
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#批处理"><span class="toc-number">1.</span> <span class="toc-text">批处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Rich-函数"><span class="toc-number">2.</span> <span class="toc-text">Rich 函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#传递参数给函数"><span class="toc-number">2.1.</span> <span class="toc-text">传递参数给函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#全局变量"><span class="toc-number">2.2.</span> <span class="toc-text">全局变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#广播"><span class="toc-number">3.</span> <span class="toc-text">广播</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TF-IDF计算"><span class="toc-number">4.</span> <span class="toc-text">TF-IDF计算</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Flink实现计算TF-IDF"><span class="toc-number">4.1.</span> <span class="toc-text">Flink实现计算TF-IDF</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TF-IDF向量相似度计算"><span class="toc-number">5.</span> <span class="toc-text">TF-IDF向量相似度计算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#完整的计算tf-idf"><span class="toc-number">6.</span> <span class="toc-text">完整的计算tf-idf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最后的话"><span class="toc-number">7.</span> <span class="toc-text">最后的话</span></a></li></ol>
+		
+		</div>
+		
+		<p>本文讲述在Flink下怎么实现批处理操作，以计算文档的TF-IDF向量为例子。</p>
+<h2 id="批处理"><a href="#批处理" class="headerlink" title="批处理"></a>批处理</h2><p>Flink下批处理用的数据类型是DataSet，按照一条一条记录存储，可以在多个分区上。Flink操作算子分为不打乱数据的分区和打乱数据分区两种；像map，flatmap这样单条执行的不打乱原有数据分区；而像groupBy，join等，会出现数据的新分区。</p>
+<h2 id="Rich-函数"><a href="#Rich-函数" class="headerlink" title="Rich 函数"></a>Rich 函数</h2><p>Flink下可拓展的函数，并且可以与环境相互操作。除自定义的函数外（如 map、reduce 等），富函数还提供了四种函数：open, close, getRuntimeContext，以及setRuntimeContext。这些对于参数化函数，创建和销毁本地状态，访问广播变量，以及访问运行时信息如累加器和计数器（参考 Accumulators 和 Counters），还有迭代信都是有很大帮助的。</p>
+<p>富函数同样可以被定义成匿名类：</p>
+<p>data.map (new RichMapFunction[String, Int] {<br>  def map(in: String):Int = { in.toInt }<br>})</p>
+<h3 id="传递参数给函数"><a href="#传递参数给函数" class="headerlink" title="传递参数给函数"></a>传递参数给函数</h3><p>传递参数给函数可以使用构造函数或withParameters(Configuration) 。 这些参数被序列化作为函数对象的部分并被发送到每个task实例,(每个task都会被接受到)。</p>
+<p>构造函数,即构造基本的操作算子,map,filter,flatmap,(因为算子是每个task都能执行的,参数也就带上)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">val toFilter = env.fromElements(1, 2, 3)</span><br><span class="line">toFilter.filter(new MyFilter(2))//2是传递的参数,在每个task中都能接受到,</span><br><span class="line">class MyFilter(<span class="built_in">limit</span>: Int) extends FilterFunction[Int] &#123;</span><br><span class="line">  override def filter(value: Int): Boolean = &#123;</span><br><span class="line">    value &gt; <span class="built_in">limit</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>withParameters需要自定义,并且在richfunction中使用,离不开configuration对象,它是一个map， key类型是string，value是其他类型。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">val toFilter = env.fromElements(1, 2, 3)</span><br><span class="line">val c = new Configuration()  //以Configuration作为媒介,传递参数</span><br><span class="line">c.setInteger(<span class="string">"limit"</span>, 2)</span><br><span class="line">toFilter.filter(new RichFilterFunction[Int]() &#123; //注意,需要是richfunction</span><br><span class="line">    var <span class="built_in">limit</span> = 0</span><br><span class="line">    override def open(config: Configuration): Unit = &#123;</span><br><span class="line">      <span class="built_in">limit</span> = config.getInteger(<span class="string">"limit"</span>, 0)  //把参数读取出来,open只会执行一次,即在每个task中执行一次,</span><br><span class="line">    &#125;</span><br><span class="line">    def filter(<span class="keyword">in</span>: Int): Boolean = &#123;       </span><br><span class="line">        <span class="keyword">in</span> &gt; <span class="built_in">limit</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;).withParameters(c)  //withParameter方法,</span><br></pre></td></tr></table></figure>
+<h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>flink 同样允许传递实现ExecutionConfig接口的自定义对象到环境中。 这个执行config在所有的rich 用户函数中都是可以访问的， 它是所有函数都可以获取。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">val env = ExecutionEnvironment.getExecutionEnvironment</span><br><span class="line">val conf = new Configuration()</span><br><span class="line">conf.setString(<span class="string">"mykey"</span>, <span class="string">"myvalue"</span>)</span><br><span class="line">env.getConfig.setGlobalJobParameters(conf)</span><br></pre></td></tr></table></figure>
+<p>使用richfunction时,open或者方法中的参数值,必须是能够序列化的,如果不能序列化,则需要进行操作,</p>
+<h2 id="广播"><a href="#广播" class="headerlink" title="广播"></a>广播</h2><p>广播数据集在Spark下也存在，分布式计算下，需要把一些数据分发到所有的计算节点下运行。在Flink下，广播DataSet实际上把数据当成collect广播到节点上。因此，广播的数据不能太大，会造成广播时间太长，后续处理的算子等待导致背压；另外，广播会占用网络传输资源。</p>
+<p>广播的两个阶段：</p>
+<p>Broadcast: 广播set通过withBroadcastSet(DataSet, String)来注册，<br>Access: 在一个函数内通过getRuntimeContext().getBroadcastVariable(String)来访问，</p>
+<p>一个例子：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">val toBroadcast = env.fromElements(1, 2, 3)</span><br><span class="line"></span><br><span class="line">val data = env.fromElements(<span class="string">"a"</span>, <span class="string">"b"</span>)</span><br><span class="line"></span><br><span class="line">data.map(new RichMapFunction[String, String]() &#123;</span><br><span class="line">    var broadcastSet: Traversable[String] = null</span><br><span class="line"></span><br><span class="line">    override def open(config: Configuration): Unit = &#123;</span><br><span class="line">      // 3. Access the broadcasted DataSet as a Collection</span><br><span class="line">      broadcastSet = getRuntimeContext().getBroadcastVariable[String](<span class="string">"broadcastSetName"</span>).asScala</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    def map(<span class="keyword">in</span>: String): String = &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;).withBroadcastSet(toBroadcast, <span class="string">"broadcastSetName"</span>) // 2. Broadcast the DataSet</span><br></pre></td></tr></table></figure></p>
+<h2 id="TF-IDF计算"><a href="#TF-IDF计算" class="headerlink" title="TF-IDF计算"></a>TF-IDF计算</h2><p>文本分析中不可或缺的一个特征即TF-IDF。计算方式有多种，这里采取的是标准的计算方式：</p>
+<p>TF：文档的词频，tf[word,doc]，即一个词word在该文档doc中出现的次数；<br>IDF：逆文档频率，即总的训练集中包含该词的文档数与总文档的比值，一般是log[(total+1)/(countDoc+1)];</p>
+<p>代表的含义：</p>
+<p>TF：如果某个词或短语在一篇文章中出现的频率TF高，并在其他文章中很少出现，则认为此词具有很好的区分能力。</p>
+<p>TF-IDF更倾向过滤掉常见的词，留下重要的词。</p>
+<h3 id="Flink实现计算TF-IDF"><a href="#Flink实现计算TF-IDF" class="headerlink" title="Flink实现计算TF-IDF"></a>Flink实现计算TF-IDF</h3><p>在Flink下实现计算TF-IDF，用到的是批处理，是从静态的数据集中计算。分成三个方法进行。</p>
+<p>读取数据集，并要做分词处理，分词后续会讲解，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">val env = ExecutionEnvironment.getExecutionEnvironment</span><br><span class="line">//源数据存储的格式 id\tword1空格word2空格word3</span><br><span class="line">val file = <span class="string">"key_word_test.txt"</span></span><br><span class="line">val mails = env.readTextFile(file).map&#123;one =&gt;</span><br><span class="line">val values = one.split(<span class="string">"\t"</span>)</span><br><span class="line">val id = values.apply(0)</span><br><span class="line">val words = values.apply(1).split(<span class="string">" "</span>)</span><br><span class="line">            (id,words)</span><br><span class="line">&#125;.name(<span class="string">"docs"</span>)</span><br></pre></td></tr></table></figure>
+<p>计算TF，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//输入的是多篇文档</span><br><span class="line">    //(文档id,词在文档中的id,词在文档中出现的次数)</span><br><span class="line">def computeTF(data:DataSet[(String, Array[String])]):DataSet[(String, String, Int)]=&#123;</span><br><span class="line">     data.flatMap&#123; m=&gt;</span><br><span class="line">       m._2.groupBy &#123; w =&gt; w&#125;.map&#123;e=&gt;(m._1,e._1,e._2.length)&#125;</span><br><span class="line">     &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">//输入的是一篇文档</span><br><span class="line">     //(文档id,词在文档中的id,词在文档中出现的次数)</span><br><span class="line">def computeTF(data:(String, Array[String])):List[(String, String, Int)]=&#123;</span><br><span class="line">      val id = data._1</span><br><span class="line">      val result = data._2.groupBy &#123; w =&gt; w&#125;.map&#123; e =&gt;</span><br><span class="line">         (id,e._1,e._2.length)</span><br><span class="line">       &#125;</span><br><span class="line">       result.toList</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>计算IDF，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//输入的是多篇文档</span><br><span class="line">    //1,每篇文档中词进行去重(是单独一篇文档,不是全部文档)</span><br><span class="line">    //2,计算词在整个集中出现的次数(即单个词出现的文档数量)</span><br><span class="line">def computeIDF(data:DataSet[(String, Array[String])]):DataSet[(String, Int)]=&#123;</span><br><span class="line">     data.flatMap&#123;m=&gt;m._2.toSet&#125;</span><br><span class="line">     .map &#123; m =&gt; (m,1) &#125;</span><br><span class="line">     .groupBy(0)</span><br><span class="line">     .sum(1)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>计算TF-IDF,</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">  /**</span><br><span class="line">   计算文档的TF-IDF,返回文档id,词,词的tf-idf值;[tf和idf逐条计算]</span><br><span class="line">   **/</span><br><span class="line">def computeTFIDFOneByOne(data:DataSet[(String, Array[String])]):DataSet[(String,Array[(String,Double)])]=&#123;</span><br><span class="line"></span><br><span class="line">         import scala.collection.JavaConverters._</span><br><span class="line">         import breeze.linalg._     </span><br><span class="line"></span><br><span class="line">         val dataBroad = data.map&#123;x=&gt;x&#125;.name(<span class="string">"broad cast"</span>)</span><br><span class="line"></span><br><span class="line">         val result = data.map(new RichMapFunction[(String, Array[String]),(String,Array[(String,Double)])]()&#123;</span><br><span class="line"></span><br><span class="line">             var toDataBroad:scala.collection.mutable.Buffer[(String, Array[String])]= null</span><br><span class="line"></span><br><span class="line">             override def open(config: Configuration): Unit = &#123;</span><br><span class="line">                     toDataBroad = getRuntimeContext().getBroadcastVariable[(String, Array[String])](<span class="string">"toData"</span>).asScala</span><br><span class="line">             &#125;</span><br><span class="line"></span><br><span class="line">            override def map(from:(String, Array[String])):(String,Array[(String,Double)])=&#123;  </span><br><span class="line">                     val docWordCount = from._2.groupBy &#123;w =&gt; w&#125;.map&#123; e =&gt;(e._1,e._2.length)&#125;</span><br><span class="line">                     val total = toDataBroad.length.toDouble</span><br><span class="line"></span><br><span class="line">                     val docId = from._1</span><br><span class="line">                     val words = from._2.toSet                  </span><br><span class="line">                     val res = toDataBroad.filter(_._1 != docId)</span><br><span class="line">                     val returnData = words.map &#123; word =&gt;</span><br><span class="line">                         var countIDF = 1.0</span><br><span class="line">                         res.foreach&#123;otherDoc=&gt;</span><br><span class="line">                            <span class="keyword">if</span> (otherDoc._2.toSet.contains(word))&#123;</span><br><span class="line">                              countIDF = countIDF + 1.0</span><br><span class="line">                            &#125;</span><br><span class="line">                         &#125;</span><br><span class="line">                         val tdidf = docWordCount.get(word).get*Math.log((total+1.0)/(countIDF+1.0))</span><br><span class="line">                         (word,tdidf)</span><br><span class="line">                     &#125;</span><br><span class="line">                     (docId,returnData.toArray)</span><br><span class="line">          &#125;  </span><br><span class="line">      &#125;).withBroadcastSet(dataBroad, <span class="string">"toData"</span>)</span><br><span class="line">      result</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>计算TF-IDF向量，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">def computeTFIDFVector(tfidfs:DataSet[(String,Array[(String,Double)])]):DataSet[(String,Int,Array[(Int, Double)])]=&#123;</span><br><span class="line">      val allWords = computeWordsDictionary(tfidfs)</span><br><span class="line"></span><br><span class="line">      val TFIDF_MODEL = tfidfs.map(new RichMapFunction[(String,Array[(String,Double)]),(String,Int,Array[(Int, Double)])]()&#123;</span><br><span class="line">          import scala.collection.JavaConverters._</span><br><span class="line">          var allWordsBroad:scala.collection.mutable.Buffer[String]= null</span><br><span class="line"></span><br><span class="line">          override def open(config: Configuration): Unit = &#123;</span><br><span class="line">              allWordsBroad = getRuntimeContext().getBroadcastVariable[String](<span class="string">"allwords"</span>).asScala</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          override def map(value:(String,Array[(String,Double)])):(String,Int,Array[(Int, Double)])=&#123;</span><br><span class="line">             val docId = value._1</span><br><span class="line">             val idvalueMap = value._2.map&#123; x=&gt;</span><br><span class="line">                val i = allWordsBroad.indexOf(x._1)</span><br><span class="line">                (i,x._2)</span><br><span class="line">             &#125;.sortBy(_._1)</span><br><span class="line">             (docId,allWordsBroad.size,idvalueMap.toArray)</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">    &#125;).withBroadcastSet(allWords, <span class="string">"allwords"</span>)</span><br><span class="line"></span><br><span class="line">    TFIDF_MODEL</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="TF-IDF向量相似度计算"><a href="#TF-IDF向量相似度计算" class="headerlink" title="TF-IDF向量相似度计算"></a>TF-IDF向量相似度计算</h2><p>从上述，计算TF-IDF向量时，返回的类型是(String,Int,Array[(Int, Double)])，并非是一个向量。因此，在使用时，需要做一些处理。下面，采取的是稀疏型向量和密集型向量的计算。能用稀疏就用稀疏，稀疏的时间比密集的快2倍左右。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">import org.apache.flink.api.scala._</span><br><span class="line">import breeze.linalg.&#123;DenseVector =&gt; BDV,SparseVector =&gt;BSV&#125;</span><br><span class="line">import org.apache.flink.api.common.functions.RichMapFunction</span><br><span class="line">import org.apache.flink.configuration.Configuration</span><br><span class="line">import basecommon.JsonUtils</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line">   计算稀疏向量间的迪卡尔积,取排名前n个记录</span><br><span class="line">   **/</span><br><span class="line">  def tfidfCosDistance(data:DataSet[(String,Int,Array[(Int,Double)])],firstN:Int):DataSet[(String,Array[(String,Double)])]=&#123;</span><br><span class="line">         import scala.collection.JavaConverters._</span><br><span class="line">         import breeze.linalg._      </span><br><span class="line"></span><br><span class="line">         val dataBroad = data.map(x=&gt;x).name(<span class="string">"broad cast"</span>)</span><br><span class="line"></span><br><span class="line">         val result = data.map(new RichMapFunction[(String,Int,Array[(Int,Double)]),(String,Array[(String,Double)])]()&#123;</span><br><span class="line"></span><br><span class="line">             var toDataBroad:scala.collection.mutable.Buffer[(String, Int,Array[(Int,Double)])]= null</span><br><span class="line"></span><br><span class="line">             override def open(config: Configuration): Unit = &#123;</span><br><span class="line">                     toDataBroad = getRuntimeContext().getBroadcastVariable[(String, Int,Array[(Int,Double)])](<span class="string">"toData"</span>).asScala</span><br><span class="line">             &#125;</span><br><span class="line"></span><br><span class="line">            override def map(from:(String,Int,Array[(Int,Double)])):(String,Array[(String,Double)])=&#123;</span><br><span class="line"></span><br><span class="line">                     val fromId = from._1</span><br><span class="line">                     val size = from._2</span><br><span class="line">                     val fromIndexs = from._3.map(_._1)</span><br><span class="line">                     val fromDatas = from._3.map(_._2)</span><br><span class="line">                     val bdv1 = new BSV[Double](fromIndexs,fromDatas,size)</span><br><span class="line">                     val res = toDataBroad.filter(_._1!=from._1)</span><br><span class="line">                       .map&#123; to =&gt;</span><br><span class="line">                                val toIndexs = to._3.map(_._1)</span><br><span class="line">                                val toDatas = to._3.map(_._2)</span><br><span class="line">                                val bdv2 = new BSV[Double](toIndexs,toDatas,size)</span><br><span class="line">                                val cosSim =  getCosSimValue(bdv1.dot(bdv2)/(norm(bdv1)*norm(bdv2)))</span><br><span class="line">                                (to._1, cosSim)</span><br><span class="line">                           &#125;.sortWith(_._2&gt;_._2).take(firstN).toArray</span><br><span class="line">             (from._1,res)</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">      &#125;).withBroadcastSet(dataBroad, <span class="string">"toData"</span>)</span><br><span class="line"></span><br><span class="line">      result</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   计算密集向量间的迪卡尔积,取排名前n个记录</span><br><span class="line">   **/</span><br><span class="line">  def word2vecCosDistance(data:DataSet[(String,Array[Double])],firstN:Int):DataSet[(String,Array[(String,Double)])]=&#123;</span><br><span class="line">         import scala.collection.JavaConverters._</span><br><span class="line">         import breeze.linalg._</span><br><span class="line"></span><br><span class="line">          val dataBroad = data.map(x=&gt;x).name(<span class="string">"broad cast"</span>)</span><br><span class="line"></span><br><span class="line">         val result = data.map(new RichMapFunction[(String, Array[Double]),(String,Array[(String,Double)])]()&#123;</span><br><span class="line"></span><br><span class="line">             var toDataBroad:scala.collection.mutable.Buffer[(String, Array[Double])]= null</span><br><span class="line"></span><br><span class="line">             override def open(config: Configuration): Unit = &#123;</span><br><span class="line">                     toDataBroad = getRuntimeContext().getBroadcastVariable[(String, Array[Double])](<span class="string">"toData"</span>).asScala</span><br><span class="line">             &#125;</span><br><span class="line"></span><br><span class="line">            override def map(from:(String, Array[Double])):(String,Array[(String,Double)])=&#123;</span><br><span class="line">                     //val bdv1 = new BDV(from._2)</span><br><span class="line">                     val bdv1 = BSV.apply(from._2)</span><br><span class="line">                     val res = toDataBroad.filter(_._1!=from._1)</span><br><span class="line">                       .map&#123; to =&gt;</span><br><span class="line">                             //val bdv2 = new BDV(to._2)</span><br><span class="line">                             val bdv2 = BSV.apply(to._2)</span><br><span class="line">                             val cosSim =  getCosSimValue(bdv1.dot(bdv2)/(norm(bdv1)*norm(bdv2)))</span><br><span class="line">                            (to._1, cosSim)</span><br><span class="line">                           &#125;.sortWith(_._2&gt;_._2).take(firstN).toArray</span><br><span class="line">                   (from._1,res)</span><br><span class="line">             &#125;</span><br><span class="line">        &#125;).withBroadcastSet(dataBroad, <span class="string">"toData"</span>)</span><br><span class="line">      result</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   /***</span><br><span class="line">    余弦值的范围限定</span><br><span class="line">    **/</span><br><span class="line">def getCosSimValue(v:Double):Double=&#123;</span><br><span class="line">         <span class="keyword">if</span> (v.isInfinity)&#123;</span><br><span class="line">                 0.0</span><br><span class="line">         &#125;<span class="keyword">else</span> <span class="keyword">if</span> (v&gt;1) &#123;</span><br><span class="line">                 1.0</span><br><span class="line">         &#125;<span class="keyword">else</span> <span class="keyword">if</span> (v.isNaN())&#123;</span><br><span class="line">                 0.0</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">else</span> &#123;</span><br><span class="line">           v</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="完整的计算tf-idf"><a href="#完整的计算tf-idf" class="headerlink" title="完整的计算tf-idf"></a>完整的计算tf-idf</h2><p>根据上述的方法分解，当有一个训练集时（提前分好词），计算文档的TF-IDF相似度，就可以用如下方式来计算，并保存，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">def main(args:Array[String]):Unit=&#123;</span><br><span class="line"></span><br><span class="line">      val env = ExecutionEnvironment.getExecutionEnvironment</span><br><span class="line">      val file = args(0)</span><br><span class="line">      val data = env.readTextFile(file).filter(!_.startsWith(<span class="string">"#"</span>)).map &#123; x =&gt;</span><br><span class="line">           val values = x.split(<span class="string">"\t"</span>)</span><br><span class="line">           (values.apply(0),values.apply(1))</span><br><span class="line">      &#125;.name(<span class="string">"origin data"</span>)</span><br><span class="line"></span><br><span class="line">     val dataSeg = docSegFilterPunctuation(env, data).name(<span class="string">"seg data"</span>)     </span><br><span class="line">     val tfidf = computeTFIDFOneByOne(dataSeg).name(<span class="string">"doc tfidf"</span>)</span><br><span class="line">     val tfidfvec = computeTFIDFVector(tfidf).name(<span class="string">"doc tfidf vec"</span>)</span><br><span class="line">     val tfidfSim = tfidfCosDistance(tfidfvec,20).name(<span class="string">"doc cos sim "</span>)     </span><br><span class="line">     val tfidfRes = tfidfSim.map(HBaseWriter.stringProcess(_))</span><br><span class="line"></span><br><span class="line">     tfidfRes.writeAsText(args(1))</span><br><span class="line"></span><br><span class="line">     env.execute()</span><br></pre></td></tr></table></figure>
+<p>分词将在后续讲解。</p>
+<h2 id="最后的话"><a href="#最后的话" class="headerlink" title="最后的话"></a>最后的话</h2><p>Flink批处理实践中众多公司的结果是比Spark快，但是在计算TF-IDF下，Flink与Spark相差不大，或许是因为Flink是用自己写的方式算，而Spark下有自带的方法，因此，上述在Flink计算TF-IDF的函数有优化的空间，欢迎优化并实验对比Spark下的。</p>
+
+	</div>
+        
+	<!-- css -->
+	<style type="text/css">
+	    .center {
+	        text-align: center;
+	    }
+	    .hidden {
+	        display: none;
+	    }
+		.donate_bar a.btn_donate{
+			display: inline-block;
+			width: 82px;
+			height: 82px;
+			background: url("http://7xsl28.com1.z0.glb.clouddn.com/btn_reward.gif") no-repeat;
+			_background: url("http://7xsl28.com1.z0.glb.clouddn.com/btn_reward.gif") no-repeat;
+		}
+
+		.donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+		.donate_bar .donate_txt {
+			display: block;
+			color: #9d9d9d;
+			font: 14px/2 "Microsoft Yahei";
+		}
+		.bold{ font-weight: bold; }
+	</style>
+	<!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+	<!-- btn_donate & tips -->
+	<div id="donate_board" class="donate_bar center">
+	    <br>
+	    ------------------------------------------------------------------------------------------------------------------------------
+	    <br>
+		<a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="打赏"></a>
+		<span class="donate_txt">
+			只卖艺不卖身，客官打赏，给您来段50的
+		</span>
+	</div>
+	<!-- /btn_donate & tips -->
+
+	<!-- donate guide -->
+
+	<div id="donate_guide" class="donate_bar center hidden">
+        <br>
+	    ------------------------------------------------------------------------------------------------------------------------------
+	    <br>
+	    
+	    <div width="100%" align="center"><div name="dashmain" id="dash-main-id-87895f" class="dash-main-3 87895f-0.99"></div></div>
+		<script type="text/javascript" charset="utf-8" src="http://www.dashangcloud.com/static/ds.js"></script>
+		
+
+		<a href="http://chloy.com/images/wechatpay.png" title="微信扫一扫" class="fancybox" rel="article0">
+			<img src="http://chloy.com/images/wechatpay.png" title="微信打赏" height="190px" width="auto"/>
+		</a>
+
+        &nbsp;&nbsp;
+
+		<a href="http://chloy.com/images/alipay.png" title="支付宝扫一扫" class="fancybox" rel="article0">
+			<img src="http://chloy.com/images/alipay.png" title="支付宝打赏" height="190px" width="auto"/>
+		</a>
+
+		<span class="donate_txt">
+			只卖艺不卖身，客官打赏，给您来段50的
+		</span>
+
+	</div>
+	<!-- /donate guide -->
+
+	<!-- donate script -->
+	<script type="text/javascript">
+		document.getElementById('btn_donate').onclick = function() {
+			$('#donate_board').addClass('hidden');
+	    $('#donate_guide').removeClass('hidden');
+		}
+
+		function donate_on_web(){
+			$('#donate').submit();
+        }
+
+		var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            document.getElementById('donate_board_wdg').className = 'hidden';
+		}
+	</script>
+	<!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+
+	<footer class="article-footer clearfix">
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://chlyzzo.github.io/2017/06/09/Flink实践-新增job-批处理/" data-title="Flink实践-新增job-批处理 | 山上掏金" data-tsina="1724571293" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+
+	</article>
+        
+
+
+
+
+    <div id="gitalk-container" style="display: inline-block; width: 90%; margin-left: 4%;"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <script src="/js/gitalk.js"></script>
+    <script src="/js/md5.min.js"></script>
+    <script type="text/javascript">
+        var gitalk = new Gitalk({
+            clientID: '9cc4ad70a7ea08a5e2ee',
+            clientSecret: '90a96ec418401a19b45f8d76efaf3a345aec3367',
+            repo: 'chlyzzo.github.io',
+            id: md5(location.pathname),
+            distractionFreeMode: true,
+            owner: 'chlyzzo',
+            admin: ['chlyzzo']
+        });
+        gitalk.render('gitalk-container')
+    </script>
+
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/06/09/Flink实践-读取kafka/" title="Flink实践-读取kafka">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Flink实践-读取kafka</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/06/09/Flink实践-搭建Flink项目/"  title="Flink实践-搭建Flink项目">
+ <strong>下一篇：</strong><br/> 
+ <span>Flink实践-搭建Flink项目
+</span>
+</a>
+</div>
+
+</nav>
+
+</div>
+
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 分享即是收获，动手后才是自己的. <br/>
+			</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1724571293" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/chlyzzo" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:rimin515@sina.cn" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		<a href="http://www.miitbeian.gov.cn/publish/query/indexFirst.action">沪ICP备18018970号</a>
+		
+		<a href="/about" target="_blank" title="chloy">chloy</a>
+		
+	        <a href="https://pages.coding.me">Hosted by Coding Pages</a>
+		</p>
+
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?81e8b61e30a0723ad6270902dbcf0bb6";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+  </body>
+</html>

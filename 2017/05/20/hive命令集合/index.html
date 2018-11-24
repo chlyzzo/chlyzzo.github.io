@@ -1,0 +1,599 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>hive命令集合 | 山上掏金</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    <meta name="baidu-site-verification" content="Poq2hMEF9U" />
+    
+    <meta name="author" content="chloy">
+    
+
+    
+    <meta name="description" content="hive一些操作常用集合命令. 建表构建一个以时间分区的表, 12345678910use 库名;drop table if exists 表名;create table 表名(   a string,   b string,   c int)partitioned by (cal_dt string)row format delimited fields terminated by &apos;\t&apos;;">
+<meta name="keywords" content="笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hive命令集合">
+<meta property="og:url" content="https://chlyzzo.github.io/2017/05/20/hive命令集合/index.html">
+<meta property="og:site_name" content="山上掏金">
+<meta property="og:description" content="hive一些操作常用集合命令. 建表构建一个以时间分区的表, 12345678910use 库名;drop table if exists 表名;create table 表名(   a string,   b string,   c int)partitioned by (cal_dt string)row format delimited fields terminated by &apos;\t&apos;;">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-06-13T07:40:42.922Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hive命令集合">
+<meta name="twitter:description" content="hive一些操作常用集合命令. 建表构建一个以时间分区的表, 12345678910use 库名;drop table if exists 表名;create table 表名(   a string,   b string,   c int)partitioned by (cal_dt string)row format delimited fields terminated by &apos;\t&apos;;">
+
+    
+    <link rel="alternative" href="/atom.xml" title="山上掏金" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <span id="busuanzi_container_site_pv">
+    站浏览量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+  <span id="busuanzi_container_site_uv">
+    站访问人数<span id="busuanzi_value_site_uv"></span>
+  </span>
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="山上掏金">山上掏金</a></h1>
+				<h2 class="blog-motto">每天早上起床就是为了比昨天更快乐，掏金者的一天是新的开始.</h2>
+			</div>                    
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">作者</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:chlyzzo.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post moveMain" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody">
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/05/20/hive命令集合/" title="hive命令集合" itemprop="url">hive命令集合</a>
+  </h1>
+  <div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/hive/">hive</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/笔记/">笔记</a>
+  </div>
+
+</div>
+
+
+  <p class="article-author">By
+       
+		<a href="/about" title="chloy" target="_blank" itemprop="author">chloy</a>
+		
+  <p class="article-time">
+    <time datetime="2017-05-20T08:10:35.000Z" itemprop="datePublished"> 2017-05-20 阅读量 <span id="busuanzi_value_page_pv"></span></time>
+  </p>
+</header>
+
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#建表"><span class="toc-number">1.</span> <span class="toc-text">建表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据导入"><span class="toc-number">2.</span> <span class="toc-text">数据导入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#json串"><span class="toc-number">3.</span> <span class="toc-text">json串</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#中文"><span class="toc-number">4.</span> <span class="toc-text">中文</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#正则"><span class="toc-number">5.</span> <span class="toc-text">正则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#时间操作"><span class="toc-number">6.</span> <span class="toc-text">时间操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义UDF"><span class="toc-number">7.</span> <span class="toc-text">自定义UDF</span></a></li></ol>
+		
+		</div>
+		
+		<p>hive一些操作常用集合命令.</p>
+<h2 id="建表"><a href="#建表" class="headerlink" title="建表"></a>建表</h2><p>构建一个以时间分区的表,</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">use 库名;</span><br><span class="line">drop table <span class="keyword">if</span> exists 表名;</span><br><span class="line">create table 表名</span><br><span class="line">(</span><br><span class="line">   a string,</span><br><span class="line">   b string,</span><br><span class="line">   c int</span><br><span class="line">)</span><br><span class="line">partitioned by (cal_dt string)</span><br><span class="line">row format delimited fields terminated by <span class="string">'\t'</span>;</span><br></pre></td></tr></table></figure>
+<p>注意分割符是\t,在读取hive时,分割字符存在两种,如果文件是压缩过的.lzo形式文件,则以\001分割,如果是part-00000形式文件,则以\t形式分割.</p>
+<h2 id="数据导入"><a href="#数据导入" class="headerlink" title="数据导入"></a>数据导入</h2><p>当数据存储在hdfs上,数据加载进表,<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">use 库名;</span><br><span class="line">load data inpath <span class="string">'/**/****/part-*'</span> into table 表名;</span><br></pre></td></tr></table></figure></p>
+<p>当数据存储在本地(指hive的服务器上),数据加载进表,需在hive shell中执行,<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">use 库名;</span><br><span class="line">load data <span class="built_in">local</span> inpath <span class="string">'/**/****/part-*'</span> into 表名;</span><br></pre></td></tr></table></figure></p>
+<p>构建一个按时间的分区表,从原有表中导入数据,不需要有分割符指定.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">use 库名;</span><br><span class="line">drop table <span class="keyword">if</span> exists 表名;</span><br><span class="line">create table 表名</span><br><span class="line">(</span><br><span class="line">   a string,</span><br><span class="line">   b string,</span><br><span class="line">   c int</span><br><span class="line">)</span><br><span class="line">partitioned by (cal_dt string)</span><br><span class="line">;</span><br><span class="line"></span><br><span class="line">insert overwrite table 库名.表名 partition (cal_dt = 时间日期)</span><br><span class="line">select *</span><br><span class="line">from *</span><br><span class="line">;</span><br></pre></td></tr></table></figure></p>
+<p>不是分区表的操作类似,只是不用加分区字段.</p>
+<h2 id="json串"><a href="#json串" class="headerlink" title="json串"></a>json串</h2><p>需加载brickhouse-0.7.1.jar的包,使用旗下的函数,</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE TEMPORARY FUNCTION to_json AS <span class="string">'brickhouse.udf.json.ToJsonUDF'</span>;</span><br><span class="line">CREATE TEMPORARY FUNCTION collect AS <span class="string">'brickhouse.udf.collect.CollectUDAF'</span>;</span><br></pre></td></tr></table></figure>
+<p>具体步骤如下:</p>
+<p>1,构建结构体,给定name和value,</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">named_struct(<span class="string">'a'</span>,a,<span class="string">'b'</span>,b,<span class="string">'c'</span>,c) as temp_item</span><br></pre></td></tr></table></figure>
+<p>2,多行转成json,</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">to_json(collect(c.temp_item)) as new_tr</span><br></pre></td></tr></table></figure>
+<h2 id="中文"><a href="#中文" class="headerlink" title="中文"></a>中文</h2><p>先提取替换掉非中文串,判断程度是否大于0.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select length(regexp_replace(<span class="string">'25'</span>,<span class="string">'([^\\u4e00-\\u9fa5]+)'</span>,<span class="string">''</span>))</span><br></pre></td></tr></table></figure>
+<p>编码转换</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">存储数据时，有时以其他编码存储中文，比如unicode编码，需要对其进行转换，</span><br><span class="line">如果是unicode编码，可以使用如下函数进行解码转换成中文：</span><br><span class="line"></span><br><span class="line">select reflect(<span class="string">"java.net.URLDecoder"</span>, <span class="string">"decode"</span>,desc) as otherdesc</span><br><span class="line"></span><br><span class="line">当然也存在编码函数java.net.URLEncoder encode</span><br><span class="line">select reflect(<span class="string">"java.net.URLEncoder"</span>, <span class="string">"encode"</span>,<span class="string">'你好'</span>) as otherdesc</span><br></pre></td></tr></table></figure>
+<h2 id="正则"><a href="#正则" class="headerlink" title="正则"></a>正则</h2><p>正则使用的常用字符，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">^ 开始       $ 结束     . 任意单个字符          * 匹配0或多个前面元素</span><br><span class="line">\ 转义       [] 匹配集合中的一个   () 组或其内容当成一个元素</span><br><span class="line">&#123;&#125; 重复      + 一个或多个与前面字符    | 或    ? 匹配0或1个前面元素</span><br><span class="line">- 特殊字符   </span><br><span class="line"></span><br><span class="line">一下是一些简单例子：</span><br><span class="line">(a|b) a或b   [abc] 单个字符是abc其中一个即可    [^abc] 不是abc的其他字符</span><br><span class="line">[a-z] a-z的字符   [A-Z] A-Z的字符   [0-7]数字0-7,\\(.*\\) 匹配(任意个字符)模式</span><br><span class="line"></span><br><span class="line">特殊字符转义表示：</span><br><span class="line">\s 空格 \S 不是空格的其他字符  \d 数字  \D 不是数字的其他字符 \w 单词  \W 标点符号</span><br><span class="line"><span class="variable">$A1</span> 访问A中的第1个</span><br><span class="line">&#123;x&#125; 重复x，&#123;x,&#125;重复x，</span><br></pre></td></tr></table></figure>
+<p>有些文本含这些字符,在hive表中显示时会跳行,需剔除掉，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">替换掉文本的换行符,tab符等,</span><br><span class="line">regexp_replace(comm_speciality,<span class="string">'\\\\n|\\\\r|\\\\t|\\t|\\r|\\n'</span>,<span class="string">''</span>) as new_comm_speciality</span><br><span class="line"></span><br><span class="line">去除html格式的编码，</span><br><span class="line">regexp_replace(collect_set(original_content)[0],<span class="string">'&lt;[^&lt;]*&gt;|&amp;[a-z]+\073'</span>,<span class="string">''</span>)</span><br><span class="line"></span><br><span class="line">regexp_extract(<span class="string">'/ask/jh-100000050006'</span>,<span class="string">'-(\\w+)'</span>,1)</span><br><span class="line">返回100000050006</span><br><span class="line"></span><br><span class="line">regexp_extract(<span class="string">'/cd/qalist/category/10'</span>,<span class="string">'\\/(\\d+)'</span>,1)</span><br><span class="line">返回10</span><br><span class="line"></span><br><span class="line">url解析，HOST,PATH,QUERY,REF,PROTOCOL,FILE,AUTHORITY,USERINFO</span><br><span class="line"></span><br><span class="line">parse_url(<span class="string">'http://beijing.***.com/ask/SE_%E5%B9%B3%E6%88%BF/p2/'</span>,<span class="string">'PATH'</span>)</span><br><span class="line"></span><br><span class="line">parse_url(<span class="string">'http://m.anjuke.com/bj/qalist/search?q=%E7%A8%8E%E8%B4%B9'</span>,<span class="string">'QUERY'</span>,<span class="string">'q'</span>)</span><br><span class="line">q=%E7%A8%8E%E8%B4%B9  是?之后的参数</span><br><span class="line"></span><br><span class="line">parse_url(<span class="string">'http://m.anjuke.com/cd/qalist/category/0?'</span>,<span class="string">'PATH'</span>)</span><br><span class="line">/<span class="built_in">cd</span>/qalist/category/0,host之后与?之前的一段,</span><br></pre></td></tr></table></figure>
+<p>正则提取，第二个参数是正则,注意转义使用\,第三个参数是正则的第几个小括号,0是全部匹配,1是代表匹配到第一个小括号的值,</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">regexp_extract(parse_url(url,<span class="string">'PATH'</span>),<span class="string">'-(\\w+)'</span>,1)</span><br><span class="line"></span><br><span class="line">regexp_extract(desc,<span class="string">'(\\d+\\.\\d+)(平.)|(\\d+)(平.)'</span>,0) /*提取带平或平米的面积*/                     </span><br><span class="line">length(regexp_extract(desc,<span class="string">'(\\d+\\.\\d+)(m.)|(\\d+)(m.)'</span>,0) /*提取带m或m2的面积*/</span><br><span class="line">但是像12min这种需要再过滤，采取同样原理过滤；整体匹配的放在前，部分放在后，即先匹配小数的。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">当提取多个符合串时，regexp_extract只能提取一个，这时采取的策略是先按照匹配的分割，分割后进行替换，得到全部的匹配串。</span><br><span class="line"></span><br><span class="line">select concat_ws(&apos;,&apos;,split(regexp_replace(&apos;朱辛庄地铁站肯特公寓，40平米两居室20万，24平13万&apos;</span><br><span class="line">       ,concat_ws(&apos;|&apos;,split(&apos;朱辛庄地铁站肯特公寓，40平米两居室20万，24平米13万&apos;</span><br><span class="line">                ,&apos;((\\d+\\.\\d+)(平米)|(\\d+)(平米)|(\\d+\\.\\d+)(平)|(\\d+)(平)|(\\d+\\.\\d+)(m2)|(\\d+)(m2))&apos;</span><br><span class="line">                ))</span><br><span class="line">       ,&apos;&apos;)</span><br><span class="line">       ,&apos;平米|平|m2&apos;))</span><br><span class="line">~~~bash</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">hive下的map,</span><br><span class="line"></span><br><span class="line">~~~bash</span><br><span class="line">select str_to_map(&apos;/ask/SE_dsfdsf/p2/&apos;,&apos;_&apos;,&apos;/&apos;)</span><br><span class="line">    得到  &#123;&quot;&quot;:&quot;ask/SE&quot;,&quot;dsfdsf&quot;:&quot;p2/&quot;&#125;</span><br><span class="line">         参数含义 (串,分割符,字串的key-value分割符)</span><br></pre></td></tr></table></figure>
+<p>得到一个map的keys,map_keys(map),map是key-value类型的map,</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select map_keys(str_to_map(<span class="string">'/ask/SE_dsfdsf/p2/'</span>,<span class="string">'_'</span>,<span class="string">'/'</span>))[1]</span><br><span class="line">   返回dsfdsf,</span><br></pre></td></tr></table></figure>
+<p>concat(每个字段接着隔开的字符)</p>
+<p>concat_ws(‘:’,collect_set(mid)),把mid字段进行合并,多条记录合并成一个;<br>concat(a1,’:’,a2),把多行并列成一行,值用:连接,</p>
+<p>不重复排序记录<br>row_number() over(partition by <strong>* order by </strong> )</p>
+<p>json串和行转列</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"> select *</span><br><span class="line">      from</span><br><span class="line">      (</span><br><span class="line">        select  *</span><br><span class="line">               ,regexp_replace(get_json_object(base_info,<span class="string">'$.a'</span>),<span class="string">'\\[|"|\\]'</span>,<span class="string">''</span>)   as a</span><br><span class="line">               ,regexp_replace(get_json_object(base_info,<span class="string">'$.b'</span>),<span class="string">'\\[|"|\\]'</span>,<span class="string">''</span>)   as b</span><br><span class="line">        from 表名</span><br><span class="line">      )a</span><br><span class="line">      lateral view explode(split(a,<span class="string">','</span>)) b as a</span><br><span class="line">;</span><br><span class="line"></span><br><span class="line">json串解析</span><br><span class="line">get_json_object(base_info,<span class="string">'$.a'</span>)</span><br><span class="line"></span><br><span class="line">一行中多个值转成多行,即多值变成列值,</span><br><span class="line">lateral view explode(split(as,<span class="string">','</span>)) b as a</span><br><span class="line"></span><br><span class="line">brickhouse-*.*.*.jar包解析json串</span><br><span class="line">create temporary <span class="keyword">function</span> from_json as <span class="string">'brickhouse.udf.json.FromJsonUDF'</span>;</span><br><span class="line">from_json(items,<span class="string">'array&lt;map&lt;string,int&gt;&gt;'</span>)，解析出[&#123;&#125;,&#123;&#125;,...,&#123;&#125;]类型数据，访问则与map一致，map[keyname].</span><br><span class="line"></span><br><span class="line">集合操作，把数据聚集，collect_set是对数据进行了去重操作后的聚集；如果需要不去重，则使用brickhouse-0.7.1.jar中的collect函数，</span><br><span class="line">ADD JAR ****/brickhouse-0.7.1.jar;</span><br><span class="line">create temporary <span class="keyword">function</span> collect as <span class="string">'brickhouse.udf.collect.CollectUDAF'</span>;</span><br><span class="line"></span><br><span class="line">数组切分出</span><br><span class="line"></span><br><span class="line">from tableName</span><br><span class="line">lateral view explode(</span><br><span class="line">  from_json(para, <span class="string">'array&lt;map&lt;string,string&gt;&gt;'</span>)</span><br><span class="line">) x as item</span><br><span class="line"><span class="built_in">where</span> 条件</span><br></pre></td></tr></table></figure>
+<h2 id="时间操作"><a href="#时间操作" class="headerlink" title="时间操作"></a>时间操作</h2><p>时间戳转日期,<br>from_unixtime(unix_timestamp(),’yyyy-MM-dd HH:mm:ss’)</p>
+<p>日期转时间戳，到秒，1494567967，<br>unix_timestamp(‘2017-05-12 13:45:67’)</p>
+<p>转成日期,2017-01-01形式,<br>to_date(‘2017-01-01 00:07:59.0’)</p>
+<p>时间减,当前固定天数<br>date_sub(${dealDate},59)</p>
+<p>时间加，在原有日期上加上固定天数<br>date_add</p>
+<p>时间减,前面时间减去后面时间,得到的是相差天数<br>datediff(‘2016-12-07’,’2016-12-08’)</p>
+<p>取日期的year，month，day，hour，minute，second，<br>year(‘2017-05-12 13:45:67’)</p>
+<h2 id="自定义UDF"><a href="#自定义UDF" class="headerlink" title="自定义UDF"></a>自定义UDF</h2><p>在操作表时，需要多一些数据进行特殊处理，而hive自带的函数却没有能解决到的，这种情况出现在特定业务场景下，以及需要操作特殊数据得到自定义结果，以下是几个例子，仅供参考学习，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">自定义一些map&lt;key,value&gt;，虽然可以在hive中指定，但是出现hive中需要大量的语句，即赋值语句，对操作不太美观。</span><br><span class="line">比如建一张额外表，存储key-value关系，</span><br><span class="line"></span><br><span class="line">create table tableName as</span><br><span class="line">select 1 as map_id</span><br><span class="line">       , map(<span class="string">'1'</span>,<span class="string">'label1'</span>,</span><br><span class="line">             <span class="string">'2'</span>,<span class="string">'label2'</span>,</span><br><span class="line">             <span class="string">'3'</span>,<span class="string">'label3'</span></span><br><span class="line">            )</span><br><span class="line">        as catalog_encode</span><br><span class="line">;</span><br><span class="line"></span><br><span class="line">因此需要做一个黑盒的函数，供使用者，是一个透明的；定义如下函数，</span><br><span class="line"></span><br><span class="line">package 包名;</span><br><span class="line"></span><br><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.Map;</span><br><span class="line"></span><br><span class="line">import org.apache.hadoop.hive.ql.exec.UDF;</span><br><span class="line"></span><br><span class="line">public class CatalogDedoce extends UDF&#123;</span><br><span class="line"></span><br><span class="line">	public Map&lt;String,Object&gt; <span class="function"><span class="title">initMap</span></span>()&#123;</span><br><span class="line">		Map&lt;String,Object&gt; result = new HashMap&lt;&gt;();</span><br><span class="line">		map.put(<span class="string">'1'</span>,<span class="string">'label1'</span>);</span><br><span class="line">                map.put(<span class="string">'2'</span>,<span class="string">'label2'</span>);</span><br><span class="line">                map.put(<span class="string">'3'</span>,<span class="string">'label3'</span>);</span><br><span class="line">		<span class="built_in">return</span> result;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public String evaluate(final String key)</span><br><span class="line">    &#123;  </span><br><span class="line">        <span class="keyword">if</span>(key == null)</span><br><span class="line">            <span class="built_in">return</span> null;</span><br><span class="line">        Map&lt;String,Object&gt; catalog_code = initMap();</span><br><span class="line">        <span class="built_in">return</span> catalog_code.get(key).toString();</span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">然后，对其打包，在eclipse里直接<span class="built_in">export</span>即可。然后，在hive时add包即可。当有多个自定义操作函数时，可放在一个包下，<span class="built_in">export</span>出包即可。</span><br></pre></td></tr></table></figure>
+<p>对数据的操作还会对array&lt;任意类型&gt;数据类型操作，这时在hive里自带一些通用的方法，但是需要对其中数据进行特定的判断则需要自己定义方法实现，下面是判断一个判断数组中函数个数，以及连续数字的操作。</p>
+<figure class="highlight plain"><figcaption><span>bash</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public class 类名 extends UDF&#123;</span><br><span class="line"></span><br><span class="line">	public int evaluate(List&lt;Long&gt; arguments,int spaceMinute,int hasNum,int totalNum)&#123;  </span><br><span class="line"></span><br><span class="line">		if (arguments!=null &amp;&amp; !arguments.isEmpty())&#123;</span><br><span class="line">			int len = arguments.size();</span><br><span class="line"></span><br><span class="line">			if (len&gt;totalNum)&#123;</span><br><span class="line">				return 3;</span><br><span class="line">			&#125;</span><br><span class="line">			if (len&gt;hasNum)&#123;</span><br><span class="line">				int start = 0;</span><br><span class="line">				int end = start+hasNum;</span><br><span class="line">				while (end&lt;len)&#123;</span><br><span class="line">					if ((arguments.get(end)-arguments.get(start))/60&lt;=spaceMinute)&#123;</span><br><span class="line">						return 2;</span><br><span class="line">					&#125;</span><br><span class="line">					start = start + 1;</span><br><span class="line">					end = start+hasNum;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	     return 0;</span><br><span class="line">	&#125;  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">在hive中array&lt;&gt;类型对应java的List。</span><br></pre></td></tr></table></figure>
+<p>使用自定义的函数方式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ADD JAR *****.jar;</span><br><span class="line">CREATE TEMPORARY FUNCTION 函数名 AS <span class="string">'包.类'</span>;</span><br><span class="line"></span><br><span class="line">函数名(字段,[参数])</span><br></pre></td></tr></table></figure>
+
+	</div>
+        
+	<!-- css -->
+	<style type="text/css">
+	    .center {
+	        text-align: center;
+	    }
+	    .hidden {
+	        display: none;
+	    }
+		.donate_bar a.btn_donate{
+			display: inline-block;
+			width: 82px;
+			height: 82px;
+			background: url("http://7xsl28.com1.z0.glb.clouddn.com/btn_reward.gif") no-repeat;
+			_background: url("http://7xsl28.com1.z0.glb.clouddn.com/btn_reward.gif") no-repeat;
+		}
+
+		.donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+		.donate_bar .donate_txt {
+			display: block;
+			color: #9d9d9d;
+			font: 14px/2 "Microsoft Yahei";
+		}
+		.bold{ font-weight: bold; }
+	</style>
+	<!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+	<!-- btn_donate & tips -->
+	<div id="donate_board" class="donate_bar center">
+	    <br>
+	    ------------------------------------------------------------------------------------------------------------------------------
+	    <br>
+		<a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="打赏"></a>
+		<span class="donate_txt">
+			只卖艺不卖身，客官打赏，给您来段50的
+		</span>
+	</div>
+	<!-- /btn_donate & tips -->
+
+	<!-- donate guide -->
+
+	<div id="donate_guide" class="donate_bar center hidden">
+        <br>
+	    ------------------------------------------------------------------------------------------------------------------------------
+	    <br>
+	    
+	    <div width="100%" align="center"><div name="dashmain" id="dash-main-id-87895f" class="dash-main-3 87895f-0.99"></div></div>
+		<script type="text/javascript" charset="utf-8" src="http://www.dashangcloud.com/static/ds.js"></script>
+		
+
+		<a href="http://chloy.com/images/wechatpay.png" title="微信扫一扫" class="fancybox" rel="article0">
+			<img src="http://chloy.com/images/wechatpay.png" title="微信打赏" height="190px" width="auto"/>
+		</a>
+
+        &nbsp;&nbsp;
+
+		<a href="http://chloy.com/images/alipay.png" title="支付宝扫一扫" class="fancybox" rel="article0">
+			<img src="http://chloy.com/images/alipay.png" title="支付宝打赏" height="190px" width="auto"/>
+		</a>
+
+		<span class="donate_txt">
+			只卖艺不卖身，客官打赏，给您来段50的
+		</span>
+
+	</div>
+	<!-- /donate guide -->
+
+	<!-- donate script -->
+	<script type="text/javascript">
+		document.getElementById('btn_donate').onclick = function() {
+			$('#donate_board').addClass('hidden');
+	    $('#donate_guide').removeClass('hidden');
+		}
+
+		function donate_on_web(){
+			$('#donate').submit();
+        }
+
+		var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            document.getElementById('donate_board_wdg').className = 'hidden';
+		}
+	</script>
+	<!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+
+	<footer class="article-footer clearfix">
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://chlyzzo.github.io/2017/05/20/hive命令集合/" data-title="hive命令集合 | 山上掏金" data-tsina="1724571293" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+
+	</article>
+        
+
+
+
+
+    <div id="gitalk-container" style="display: inline-block; width: 90%; margin-left: 4%;"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <script src="/js/gitalk.js"></script>
+    <script src="/js/md5.min.js"></script>
+    <script type="text/javascript">
+        var gitalk = new Gitalk({
+            clientID: '9cc4ad70a7ea08a5e2ee',
+            clientSecret: '90a96ec418401a19b45f8d76efaf3a345aec3367',
+            repo: 'chlyzzo.github.io',
+            id: md5(location.pathname),
+            distractionFreeMode: true,
+            owner: 'chlyzzo',
+            admin: ['chlyzzo']
+        });
+        gitalk.render('gitalk-container')
+    </script>
+
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/06/01/hello-world/" title="开始搭建-hexo-git-blog">
+  <strong>上一篇：</strong><br/>
+  <span>
+  开始搭建-hexo-git-blog</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/05/19/flink学习/"  title="Flink学习">
+ <strong>下一篇：</strong><br/> 
+ <span>Flink学习
+</span>
+</a>
+</div>
+
+</nav>
+
+</div>
+
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 分享即是收获，动手后才是自己的. <br/>
+			</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1724571293" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/chlyzzo" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:rimin515@sina.cn" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		<a href="http://www.miitbeian.gov.cn/publish/query/indexFirst.action">沪ICP备18018970号</a>
+		
+		<a href="/about" target="_blank" title="chloy">chloy</a>
+		
+	        <a href="https://pages.coding.me">Hosted by Coding Pages</a>
+		</p>
+
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?81e8b61e30a0723ad6270902dbcf0bb6";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+  </body>
+</html>

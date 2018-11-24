@@ -1,0 +1,584 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Flink实践-搭建Flink项目 | 山上掏金</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    <meta name="baidu-site-verification" content="Poq2hMEF9U" />
+    
+    <meta name="author" content="chloy">
+    
+
+    
+    <meta name="description" content="讲述怎么搭建一个Flink的项目，一开始怎么安装环境。开始Flink开发之旅。 准备需要下载的文件有sbt，Eclipse，以及插件的网址。 sbt设置sbt的作用与maven一样，这里不做讲述，可以从sbt官网获取更多信息。下面讲述怎么安装sbt，以及验证sbt安装成功与否。 首先，必须确保开发环境的版本一致，由于开发环境涉及其他开源框架，这里统一采用了sbt-0.13.6版本。下载sbt-la">
+<meta name="keywords" content="搭建">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flink实践-搭建Flink项目">
+<meta property="og:url" content="https://chlyzzo.github.io/2017/06/09/Flink实践-搭建Flink项目/index.html">
+<meta property="og:site_name" content="山上掏金">
+<meta property="og:description" content="讲述怎么搭建一个Flink的项目，一开始怎么安装环境。开始Flink开发之旅。 准备需要下载的文件有sbt，Eclipse，以及插件的网址。 sbt设置sbt的作用与maven一样，这里不做讲述，可以从sbt官网获取更多信息。下面讲述怎么安装sbt，以及验证sbt安装成功与否。 首先，必须确保开发环境的版本一致，由于开发环境涉及其他开源框架，这里统一采用了sbt-0.13.6版本。下载sbt-la">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2017-07-01T04:59:13.465Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flink实践-搭建Flink项目">
+<meta name="twitter:description" content="讲述怎么搭建一个Flink的项目，一开始怎么安装环境。开始Flink开发之旅。 准备需要下载的文件有sbt，Eclipse，以及插件的网址。 sbt设置sbt的作用与maven一样，这里不做讲述，可以从sbt官网获取更多信息。下面讲述怎么安装sbt，以及验证sbt安装成功与否。 首先，必须确保开发环境的版本一致，由于开发环境涉及其他开源框架，这里统一采用了sbt-0.13.6版本。下载sbt-la">
+
+    
+    <link rel="alternative" href="/atom.xml" title="山上掏金" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <span id="busuanzi_container_site_pv">
+    站浏览量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+  <span id="busuanzi_container_site_uv">
+    站访问人数<span id="busuanzi_value_site_uv"></span>
+  </span>
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="山上掏金">山上掏金</a></h1>
+				<h2 class="blog-motto">每天早上起床就是为了比昨天更快乐，掏金者的一天是新的开始.</h2>
+			</div>                    
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">作者</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:chlyzzo.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post moveMain" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody">
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/06/09/Flink实践-搭建Flink项目/" title="Flink实践-搭建Flink项目" itemprop="url">Flink实践-搭建Flink项目</a>
+  </h1>
+  <div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/flink/">flink</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/搭建/">搭建</a>
+  </div>
+
+</div>
+
+
+  <p class="article-author">By
+       
+		<a href="/about" title="chloy" target="_blank" itemprop="author">chloy</a>
+		
+  <p class="article-time">
+    <time datetime="2017-06-09T07:26:56.000Z" itemprop="datePublished"> 2017-06-09 阅读量 <span id="busuanzi_value_page_pv"></span></time>
+  </p>
+</header>
+
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#准备"><span class="toc-number">1.</span> <span class="toc-text">准备</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#sbt设置"><span class="toc-number">1.1.</span> <span class="toc-text">sbt设置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Eclipse插件"><span class="toc-number">2.</span> <span class="toc-text">Eclipse插件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sbt使用生产项目"><span class="toc-number">3.</span> <span class="toc-text">sbt使用生产项目</span></a></li></ol>
+		
+		</div>
+		
+		<p>讲述怎么搭建一个Flink的项目，一开始怎么安装环境。开始Flink开发之旅。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>需要下载的文件有sbt，Eclipse，以及插件的网址。</p>
+<h3 id="sbt设置"><a href="#sbt设置" class="headerlink" title="sbt设置"></a>sbt设置</h3><p>sbt的作用与maven一样，这里不做讲述，可以从<a href="http://www.scala-sbt.org/" target="_blank" rel="noopener">sbt官网</a>获取更多信息。下面讲述怎么安装sbt，以及验证sbt安装成功与否。</p>
+<p>首先，必须确保开发环境的版本一致，由于开发环境涉及其他开源框架，这里统一采用了sbt-0.13.6版本。<br>下载<a href="https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.6/sbt-launch.jar" target="_blank" rel="noopener">sbt-launch.jar</a>,并把它放置在/bin/目录下；然后创建/bin/sbt文件，更改其模式为755，另外填写如下配置到sbt文件里：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SBT_OPTS=<span class="string">"-Xms512M -Xmx1536M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M -Dsbt.override.build.repos=true"</span></span><br><span class="line">java <span class="variable">$SBT_OPTS</span> -jar `dirname <span class="variable">$0</span>`/sbt-launch.jar <span class="string">"<span class="variable">$@</span>"</span></span><br></pre></td></tr></table></figure>
+<p>然后，是设置库，即sbt构建项目时从何处查找库，一般按照本地优先，然后是公共库，以及特殊库的顺序设置。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">在$HOME/.sbt/repositories文件里填入</span><br><span class="line"></span><br><span class="line">[repositories]</span><br><span class="line">  local</span><br><span class="line">  my-maven-snapshots:https://repository.apache.org/content/repositories/snapshots/</span><br><span class="line">  my-sbt-releases:https://repository.apache.org/content/repositories/releases/</span><br><span class="line">  my-sbt-public:https://repository.apache.org/content/repositories/public/</span><br><span class="line">  my-maven-public:http://repo.maven.apache.org/maven2/</span><br></pre></td></tr></table></figure></p>
+<p>其他库亦可添加。</p>
+<p>最后，验证安装是否成功，在命令行输入sbt –version或者sbt sbt-version，出现sbt版本即成功安装。<br>另外，sbt下载的包，均在$HOME/.ivy2/cache目录下。</p>
+<h2 id="Eclipse插件"><a href="#Eclipse插件" class="headerlink" title="Eclipse插件"></a>Eclipse插件</h2><p>开发环境用的是Eclipse，在其中安装scala的插件，打开eclipse点击help下的install new software，然后，填写名字和网站，选择对应的版本，<a href="http://scala-ide.org/download/current.html" target="_blank" rel="noopener">网址信息</a>查找，按照步骤完成安装。</p>
+<h2 id="sbt使用生产项目"><a href="#sbt使用生产项目" class="headerlink" title="sbt使用生产项目"></a>sbt使用生产项目</h2><p>使用sbt构建项目有多种方法，因为sbt下载依赖的包可以很多方式是设置，下面采取的是一种简单的方式。把各个模块当成是小项目进行生成。</p>
+<p>sbt构建项目所需的目录结果和内容，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">大目录，项目名称（英文小写）</span><br><span class="line">    build.sbt（是一个文件，用于编辑生成项目所需下载的包）</span><br><span class="line">    project（目录）</span><br><span class="line">       plugins.sbt(eclipse版本设置)</span><br><span class="line">       assembly.sbt（用于打包用）</span><br></pre></td></tr></table></figure>
+<p>把上述文件建好后，在对应的文件中添加如下信息，</p>
+<p>plugins.sbt</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">addSbtPlugin(<span class="string">"com.typesafe.sbteclipse"</span> % <span class="string">"sbteclipse-plugin"</span> % <span class="string">"2.5.0"</span>)</span><br></pre></td></tr></table></figure>
+<p>assembly.sbt</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">addSbtPlugin(<span class="string">"com.eed3si9n"</span> % <span class="string">"sbt-assembly"</span> % <span class="string">"0.12.0"</span>)</span><br></pre></td></tr></table></figure>
+<p>上述两个文件如需添加多个，记得两行之间用一个空行隔开。</p>
+<p>最关键是build.sbt文件，是项目生成的最重要的文件，其编辑的格式如下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">lazy val commonSettings = Seq(</span><br><span class="line">  <span class="comment">#organization := "****"，</span></span><br><span class="line">  <span class="comment">#version := "0.1.0",</span></span><br><span class="line">  scalaVersion := <span class="string">"2.11.8"</span>,</span><br><span class="line">  <span class="comment">#建议使用2.11版本，2.10版本会有很多兼容问题</span></span><br><span class="line">  libraryDependencies ++= Seq(</span><br><span class="line">    <span class="string">"org.scalatest"</span> %% <span class="string">"scalatest"</span> % <span class="string">"2.2.1"</span> % <span class="string">"test"</span></span><br><span class="line">  )</span><br><span class="line">)</span><br><span class="line"><span class="comment">#版本号根据自身集群环境选择，</span></span><br><span class="line">val flinkVersion = <span class="string">"****"</span></span><br><span class="line">val kafkaVersion = <span class="string">"****"</span></span><br><span class="line">val hbaseVersion = <span class="string">"****"</span></span><br><span class="line"></span><br><span class="line">lazy val flinkSettings = Seq(</span><br><span class="line">  libraryDependencies ++= Seq(</span><br><span class="line">   (<span class="string">"org.apache.flink"</span> % <span class="string">"flink-core"</span> % flinkVersion).</span><br><span class="line">   <span class="comment">#为何要排除2.10的，因为在2.11下会自动下载这个2.10的包，导致项目</span></span><br><span class="line">   <span class="comment">#生成失败，所以，必须排除掉，这是多次实践的经验，可以在后续生成结果中查找错误，根据错误进行定位</span></span><br><span class="line">                 exclude(<span class="string">"org.apache.flink"</span>,<span class="string">"flink-shaded-hadoop1_2.10"</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br><span class="line"><span class="comment">#子项目名称</span></span><br><span class="line">lazy val commonFlink = project.</span><br><span class="line">  settings(commonSettings: _*).</span><br><span class="line">  <span class="comment">#包含的配置</span></span><br><span class="line">  settings(flinkSettings: _*).</span><br><span class="line">  settings(</span><br><span class="line">     libraryDependencies ++= Seq(</span><br><span class="line">        (<span class="string">"org.apache.flink"</span> %% <span class="string">"flink-scala"</span> % flinkVersion).</span><br><span class="line">                  exclude(<span class="string">"org.apache.flink"</span>,<span class="string">"flink-shaded-hadoop1_2.10"</span>),</span><br><span class="line">        (<span class="string">"org.apache.flink"</span> %% <span class="string">"flink-streaming-scala"</span> % flinkVersion).</span><br><span class="line">                  exclude(<span class="string">"org.apache.flink"</span>,<span class="string">"flink-shaded-hadoop1_2.10"</span>),</span><br><span class="line">        (<span class="string">"org.apache.flink"</span> % <span class="string">"flink-streaming-connectors"</span> % flinkVersion).</span><br><span class="line">                  exclude(<span class="string">"org.apache.flink"</span>,<span class="string">"flink-shaded-hadoop1_2.10"</span>),</span><br><span class="line">        (<span class="string">"org.apache.flink"</span> %% <span class="string">"flink-connector-kafka-0.8"</span> % flinkVersion).</span><br><span class="line">                  exclude(<span class="string">"org.apache.flink"</span>,<span class="string">"flink-shaded-hadoop1_2.10"</span>),</span><br><span class="line">        (<span class="string">"org.apache.flink"</span> %% <span class="string">"flink-connector-rabbitmq"</span> % flinkVersion).</span><br><span class="line">                  exclude(<span class="string">"org.apache.flink"</span>,<span class="string">"flink-shaded-hadoop1_2.10"</span>),</span><br><span class="line">        (<span class="string">"org.json4s"</span> %% <span class="string">"json4s-jackson"</span> % <span class="string">"3.2.10"</span>),</span><br><span class="line">        (<span class="string">"org.apache.kafka"</span> %% <span class="string">"kafka"</span> % kafkaVersion)</span><br><span class="line">      )).</span><br><span class="line">  settings(</span><br><span class="line">      <span class="comment">#忽略策略，不同开源包存在相同的jar或者class，进行忽略选择，</span></span><br><span class="line">        assemblyMergeStrategy <span class="keyword">in</span> assembly &lt;&lt;= (assemblyMergeStrategy <span class="keyword">in</span> assembly) &#123;</span><br><span class="line">             (old) =&gt; &#123;</span><br><span class="line">                   <span class="keyword">case</span> PathList(<span class="string">"META-INF"</span>, xs @ _*) =&gt; MergeStrategy.discard</span><br><span class="line">                   <span class="keyword">case</span> x =&gt; MergeStrategy.first</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">     )</span><br><span class="line"><span class="comment">#另一个子项目</span></span><br><span class="line">lazy val example = project.dependsOn(commonFlink).</span><br><span class="line"><span class="comment">#每个项目可以依赖其他项目，使用dependsOn来控制，可以多个</span></span><br><span class="line">  settings(commonSettings: _*).</span><br><span class="line">  settings(flinkSettings: _*).</span><br><span class="line">  settings(</span><br><span class="line">    libraryDependencies ++= Seq(</span><br><span class="line">      <span class="string">"org.apache.hbase"</span> % <span class="string">"hbase-common"</span> % hbaseVersion % <span class="string">"provided"</span>,</span><br><span class="line">      <span class="string">"org.apache.hbase"</span> % <span class="string">"hbase-client"</span> % hbaseVersion % <span class="string">"provided"</span>,</span><br><span class="line">      <span class="string">"org.scalaj"</span> %% <span class="string">"scalaj-http"</span> % <span class="string">"1.1.4"</span></span><br><span class="line">    )).</span><br><span class="line">   settings(</span><br><span class="line">        assemblyMergeStrategy <span class="keyword">in</span> assembly &lt;&lt;= (assemblyMergeStrategy <span class="keyword">in</span> assembly) &#123;</span><br><span class="line">             (old) =&gt; &#123;</span><br><span class="line">                   <span class="keyword">case</span> PathList(<span class="string">"META-INF"</span>, xs @ _*) =&gt; MergeStrategy.discard</span><br><span class="line">                   <span class="keyword">case</span> x =&gt; MergeStrategy.first</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">     ).</span><br><span class="line">  settings(runMain <span class="keyword">in</span> Compile &lt;&lt;= Defaults.runMainTask(fullClasspath <span class="keyword">in</span> Compile, runner <span class="keyword">in</span>(Compile, run)))</span><br></pre></td></tr></table></figure>
+<p>构建的解析，</p>
+<p>1，build.sbt里编辑，具体信息可以查找sbt官网获得更多信息，这里提供几个快捷经验，%%会在对应包自动加上scala的版本，比如加上_2.11或者_2.10；</p>
+<p>2，当你不知道某个包的版本号时，可以从<a href="http://repo.maven.apache.org/maven2/" target="_blank" rel="noopener">maven的开源库</a>中找存在的版本;</p>
+<p>3,provided是在打包时不用加载其中，而使用运行集群中的包，或者提交运行时带上的包；为了减少打包的大小，对通用的包可以使用集群的；为了确保程序运行不报错，建议都带上，即去除provided.</p>
+<p>4,对于dependsOn的使用，具有传递性，所以不必要把所有的依赖都写上，可以根据传递依赖选择；</p>
+<p>5，在sbt生成项目时，用sbt eclipse命令，会很慢是正常的，最好能连vpn，国外网址来加速，请等待，若出现失败，请根据提示定位哪个包下载失败，或者重新sbt eclipse，多次运行；</p>
+<p>6，单个子项目中，独立添加库，如下例子，单独添加了下载amidsttoolbox的库源，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.settings(</span><br><span class="line">        resolvers += <span class="string">"my-amisttools"</span> at <span class="string">"http://maven.amidsttoolbox.com/"</span></span><br><span class="line">).</span><br></pre></td></tr></table></figure>
+<p>7,使用sbt可以打包，即sbt projectName/assembly，另在sbt构建项目下，可以设置过滤不要的包，减少打包后的jar大小，具体设置如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">.settings(</span><br><span class="line">       assemblyExcludedJars <span class="keyword">in</span> assembly := &#123;</span><br><span class="line">           val cp = (fullClasspath <span class="keyword">in</span> assembly).value</span><br><span class="line">           cp filter &#123; j =&gt;</span><br><span class="line">              j.data.getName ==<span class="string">'****.jar'</span>||</span><br><span class="line">              j.data.getName.contains(<span class="string">"***"</span>)||</span><br><span class="line">              j.data.getName.startsWith(<span class="string">"***"</span>)</span><br><span class="line">         &#125;</span><br><span class="line">       &#125;</span><br><span class="line">  )</span><br></pre></td></tr></table></figure></p>
+<p>sbt的项目中使用的一些作用，比如assemblyExcludedJars，assemblyMergeStrategy等，可以从<a href="https://github.com/sbt/sbt-assembly" target="_blank" rel="noopener">此网站</a>参考；注意的是，如果不知道去除哪些包，可以起初不去除任何包的情况下打包，把记录copy下来，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sbt projectName/assembly &gt; assemblyJar.txt</span><br></pre></td></tr></table></figure></p>
+<p>然后，在文件assemblyJar.txt中查看include的包有哪些，在确认去除哪些，并且parquet前缀的包记得一定打进去。</p>
+
+	</div>
+        
+	<!-- css -->
+	<style type="text/css">
+	    .center {
+	        text-align: center;
+	    }
+	    .hidden {
+	        display: none;
+	    }
+		.donate_bar a.btn_donate{
+			display: inline-block;
+			width: 82px;
+			height: 82px;
+			background: url("http://7xsl28.com1.z0.glb.clouddn.com/btn_reward.gif") no-repeat;
+			_background: url("http://7xsl28.com1.z0.glb.clouddn.com/btn_reward.gif") no-repeat;
+		}
+
+		.donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+		.donate_bar .donate_txt {
+			display: block;
+			color: #9d9d9d;
+			font: 14px/2 "Microsoft Yahei";
+		}
+		.bold{ font-weight: bold; }
+	</style>
+	<!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+	<!-- btn_donate & tips -->
+	<div id="donate_board" class="donate_bar center">
+	    <br>
+	    ------------------------------------------------------------------------------------------------------------------------------
+	    <br>
+		<a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="打赏"></a>
+		<span class="donate_txt">
+			只卖艺不卖身，客官打赏，给您来段50的
+		</span>
+	</div>
+	<!-- /btn_donate & tips -->
+
+	<!-- donate guide -->
+
+	<div id="donate_guide" class="donate_bar center hidden">
+        <br>
+	    ------------------------------------------------------------------------------------------------------------------------------
+	    <br>
+	    
+	    <div width="100%" align="center"><div name="dashmain" id="dash-main-id-87895f" class="dash-main-3 87895f-0.99"></div></div>
+		<script type="text/javascript" charset="utf-8" src="http://www.dashangcloud.com/static/ds.js"></script>
+		
+
+		<a href="http://chloy.com/images/wechatpay.png" title="微信扫一扫" class="fancybox" rel="article0">
+			<img src="http://chloy.com/images/wechatpay.png" title="微信打赏" height="190px" width="auto"/>
+		</a>
+
+        &nbsp;&nbsp;
+
+		<a href="http://chloy.com/images/alipay.png" title="支付宝扫一扫" class="fancybox" rel="article0">
+			<img src="http://chloy.com/images/alipay.png" title="支付宝打赏" height="190px" width="auto"/>
+		</a>
+
+		<span class="donate_txt">
+			只卖艺不卖身，客官打赏，给您来段50的
+		</span>
+
+	</div>
+	<!-- /donate guide -->
+
+	<!-- donate script -->
+	<script type="text/javascript">
+		document.getElementById('btn_donate').onclick = function() {
+			$('#donate_board').addClass('hidden');
+	    $('#donate_guide').removeClass('hidden');
+		}
+
+		function donate_on_web(){
+			$('#donate').submit();
+        }
+
+		var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            document.getElementById('donate_board_wdg').className = 'hidden';
+		}
+	</script>
+	<!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+
+	<footer class="article-footer clearfix">
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://chlyzzo.github.io/2017/06/09/Flink实践-搭建Flink项目/" data-title="Flink实践-搭建Flink项目 | 山上掏金" data-tsina="1724571293" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+
+	</article>
+        
+
+
+
+
+    <div id="gitalk-container" style="display: inline-block; width: 90%; margin-left: 4%;"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <script src="/js/gitalk.js"></script>
+    <script src="/js/md5.min.js"></script>
+    <script type="text/javascript">
+        var gitalk = new Gitalk({
+            clientID: '9cc4ad70a7ea08a5e2ee',
+            clientSecret: '90a96ec418401a19b45f8d76efaf3a345aec3367',
+            repo: 'chlyzzo.github.io',
+            id: md5(location.pathname),
+            distractionFreeMode: true,
+            owner: 'chlyzzo',
+            admin: ['chlyzzo']
+        });
+        gitalk.render('gitalk-container')
+    </script>
+
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/06/09/Flink实践-新增job-批处理/" title="Flink实践-新增job-批处理">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Flink实践-新增job-批处理</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/06/02/flink在yarn上搭建/"  title="Flink在YARN上搭建">
+ <strong>下一篇：</strong><br/> 
+ <span>Flink在YARN上搭建
+</span>
+</a>
+</div>
+
+</nav>
+
+</div>
+
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 分享即是收获，动手后才是自己的. <br/>
+			</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1724571293" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/chlyzzo" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:rimin515@sina.cn" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		<a href="http://www.miitbeian.gov.cn/publish/query/indexFirst.action">沪ICP备18018970号</a>
+		
+		<a href="/about" target="_blank" title="chloy">chloy</a>
+		
+	        <a href="https://pages.coding.me">Hosted by Coding Pages</a>
+		</p>
+
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?81e8b61e30a0723ad6270902dbcf0bb6";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+  </body>
+</html>
