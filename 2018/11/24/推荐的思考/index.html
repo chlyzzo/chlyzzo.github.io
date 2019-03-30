@@ -12,17 +12,17 @@
     
 
     
-    <meta name="description" content="在58的房产事业群部门，职责是负责资讯、问答、经纪人以及房源的推荐工作，主要偏文本一类，做数据展现的逻辑处理。后来，离开去了新的领域，着重于数据源清洗挖掘出用户行为背后的价值信息，支持推荐等功能。因为，两个不同方向、不同数据源、不同场景平台，感触颇多，对于推荐这块的更深理解和实现也跟着学习，所以，也就记录下来，以便未来做对比和提升。 ##以往的前公司的数据源是集中在房源、问答、资讯类，用户的基本信">
+    <meta name="description" content="在58的房产事业群部门，职责是负责资讯、问答、经纪人以及房源的推荐工作，主要偏文本一类，做数据展现的逻辑处理。后来，离开去了新的领域，着重于数据源清洗挖掘出用户行为背后的价值信息，支持推荐等功能。因为，两个不同方向、不同数据源、不同场景平台，感触颇多，对于推荐这块的更深理解和实现也跟着学习，所以，也就记录下来，以便未来做对比和提升。 以往的前公司的数据源是集中在房源、问答、资讯类，用户的基本信息是">
 <meta property="og:type" content="article">
 <meta property="og:title" content="推荐的思考">
 <meta property="og:url" content="https://chlyzzo.github.io/2018/11/24/推荐的思考/index.html">
 <meta property="og:site_name" content="山上掏金">
-<meta property="og:description" content="在58的房产事业群部门，职责是负责资讯、问答、经纪人以及房源的推荐工作，主要偏文本一类，做数据展现的逻辑处理。后来，离开去了新的领域，着重于数据源清洗挖掘出用户行为背后的价值信息，支持推荐等功能。因为，两个不同方向、不同数据源、不同场景平台，感触颇多，对于推荐这块的更深理解和实现也跟着学习，所以，也就记录下来，以便未来做对比和提升。 ##以往的前公司的数据源是集中在房源、问答、资讯类，用户的基本信">
+<meta property="og:description" content="在58的房产事业群部门，职责是负责资讯、问答、经纪人以及房源的推荐工作，主要偏文本一类，做数据展现的逻辑处理。后来，离开去了新的领域，着重于数据源清洗挖掘出用户行为背后的价值信息，支持推荐等功能。因为，两个不同方向、不同数据源、不同场景平台，感触颇多，对于推荐这块的更深理解和实现也跟着学习，所以，也就记录下来，以便未来做对比和提升。 以往的前公司的数据源是集中在房源、问答、资讯类，用户的基本信息是">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-30T02:49:35.817Z">
+<meta property="og:updated_time" content="2019-03-30T02:50:45.480Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="推荐的思考">
-<meta name="twitter:description" content="在58的房产事业群部门，职责是负责资讯、问答、经纪人以及房源的推荐工作，主要偏文本一类，做数据展现的逻辑处理。后来，离开去了新的领域，着重于数据源清洗挖掘出用户行为背后的价值信息，支持推荐等功能。因为，两个不同方向、不同数据源、不同场景平台，感触颇多，对于推荐这块的更深理解和实现也跟着学习，所以，也就记录下来，以便未来做对比和提升。 ##以往的前公司的数据源是集中在房源、问答、资讯类，用户的基本信">
+<meta name="twitter:description" content="在58的房产事业群部门，职责是负责资讯、问答、经纪人以及房源的推荐工作，主要偏文本一类，做数据展现的逻辑处理。后来，离开去了新的领域，着重于数据源清洗挖掘出用户行为背后的价值信息，支持推荐等功能。因为，两个不同方向、不同数据源、不同场景平台，感触颇多，对于推荐这块的更深理解和实现也跟着学习，所以，也就记录下来，以便未来做对比和提升。 以往的前公司的数据源是集中在房源、问答、资讯类，用户的基本信息是">
 
     
     <link rel="alternative" href="/atom.xml" title="山上掏金" type="application/atom+xml">
@@ -114,12 +114,12 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#房源推荐"><span class="toc-number">1.</span> <span class="toc-text">房源推荐</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#资讯流"><span class="toc-number">2.</span> <span class="toc-text">资讯流</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#问答"><span class="toc-number">2.1.</span> <span class="toc-text">问答</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#资讯流-1"><span class="toc-number">2.2.</span> <span class="toc-text">资讯流</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#其他文本"><span class="toc-number">2.3.</span> <span class="toc-text">其他文本</span></a></li></ol></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#以往的"><span class="toc-number">1.</span> <span class="toc-text">以往的</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#房源推荐"><span class="toc-number">1.1.</span> <span class="toc-text">房源推荐</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#资讯流"><span class="toc-number">1.2.</span> <span class="toc-text">资讯流</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#问答"><span class="toc-number">1.2.1.</span> <span class="toc-text">问答</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#资讯流-1"><span class="toc-number">1.2.2.</span> <span class="toc-text">资讯流</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#其他文本"><span class="toc-number">1.2.3.</span> <span class="toc-text">其他文本</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#现在的"><span class="toc-number">2.</span> <span class="toc-text">现在的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#未来的"><span class="toc-number">3.</span> <span class="toc-text">未来的</span></a></li></ol>
 		
 		</div>
 		
 		<p>在58的房产事业群部门，职责是负责资讯、问答、经纪人以及房源的推荐工作，主要偏文本一类，做数据展现的逻辑处理。后来，离开去了新的领域，着重于数据源清洗挖掘出用户行为背后的价值信息，支持推荐等功能。因为，两个不同方向、不同数据源、不同场景平台，感触颇多，对于推荐这块的更深理解和实现也跟着学习，所以，也就记录下来，以便未来做对比和提升。</p>
-<p>##以往的<br>前公司的数据源是集中在房源、问答、资讯类，用户的基本信息是空置的，只能获取到在app/pc/touch/小程序上的行为信息，而房产有个缺陷在于用户的生命周期短，粘性低，重在信息的查询。所以，推荐基于协同过滤（item-based和user-based）能获得好的效果，房源的地段/价格/户型/面积等基本维度用户关注高。</p>
+<h2 id="以往的"><a href="#以往的" class="headerlink" title="以往的"></a>以往的</h2><p>前公司的数据源是集中在房源、问答、资讯类，用户的基本信息是空置的，只能获取到在app/pc/touch/小程序上的行为信息，而房产有个缺陷在于用户的生命周期短，粘性低，重在信息的查询。所以，推荐基于协同过滤（item-based和user-based）能获得好的效果，房源的地段/价格/户型/面积等基本维度用户关注高。</p>
 <h3 id="房源推荐"><a href="#房源推荐" class="headerlink" title="房源推荐"></a>房源推荐</h3><p>房源测的信息，典型的几个特征，面积/价格/小区/户型/地点/pv/uv/小区均价/….等，推荐模块针对不同需求调用不同的推荐逻辑，热度uv/pv高的；相似根据房子属性计算相似值；感兴趣则经过改版的协同过滤计算。关键是特征维度少，使用模型预测难，需要构造特征，因此在几个典型的特征基础上，使用ffm，gbdt等重构特征进行预测，效果还是不错的。</p>
 <p>缺点也明显，数据维度少，仅仅在app/pc/wap上使用的轨迹，而且三段的id还不一样无法打通，实际上对用户测仅仅拿到一端的行为。缺少用户测信息。拓展用户测信息，首先三段打通，增加用户测信息，需要评估量；另外，引入外部数据特征。</p>
 <p>至于虚假房源，单单从房源测信息数据很难判断，需要人工干预，从价格上可以干掉一些，但是误伤很大；比对外部房源，基准有限；另外重复发的情况占比多，计算成本很大，虽然限制地域；</p>
@@ -132,9 +132,9 @@
 <p>资讯流背后需要做的事继续tag细化，tag的量多，可以带来区分，如果tag集中没有区分度，就会导致太集中；另外在排序上还需改进，线性的权重累加，一天变动一次权重，需要频次快些。</p>
 <h4 id="其他文本"><a href="#其他文本" class="headerlink" title="其他文本"></a>其他文本</h4><p>除了问答和资讯，其他的文本重心在生成上，小区问题的生层和板块解读的生成，前者是短文本，后者是短文章；后者是前者的多个拼凑。<br>原理是基于既定的对象点，然后在对象点的周围加上描述观点，最后整合成描述对象的观点句子；短文章就是多个对象的观点句子的顺序拼凑。</p>
 <p>这部分，在通顺上目前没有好的评估函数。</p>
-<p>##现在的<br>现在的百度内部数据很多，各个产品线的数据，数据量实在是太大太多。需要对业务场景细化后才去拉取分析数据。比如，对好看视频，针对的是新客，那么在爱奇艺数据源观看的行为数据很有效。ugc的内容很难提取，需要针对性挖掘。另外，特征的挖掘，其实是数据的清洗，使得在模型上更好使用，偏向底层的数据处理。</p>
+<h2 id="现在的"><a href="#现在的" class="headerlink" title="现在的"></a>现在的</h2><p>现在的百度内部数据很多，各个产品线的数据，数据量实在是太大太多。需要对业务场景细化后才去拉取分析数据。比如，对好看视频，针对的是新客，那么在爱奇艺数据源观看的行为数据很有效。ugc的内容很难提取，需要针对性挖掘。另外，特征的挖掘，其实是数据的清洗，使得在模型上更好使用，偏向底层的数据处理。</p>
 <p>尴尬的处境，也带来优势，接触最原始的数据，价值也最大。通过这些，可以挖掘出真实的意图，从而做意图的推荐关系预测等工作。数据的广度和深度使得做起来比其他人快些。</p>
-<p>##未来的<br>未来的推荐，是数据的共享，需要外部数据的引入，数据的边界限制了推荐的精准度。一个人的维度描述，是多维分，朝着更准更全目标。</p>
+<h2 id="未来的"><a href="#未来的" class="headerlink" title="未来的"></a>未来的</h2><p>未来的推荐，是数据的共享，需要外部数据的引入，数据的边界限制了推荐的精准度。一个人的维度描述，是多维分，朝着更准更全目标。</p>
 
 	</div>
         
